@@ -42,7 +42,7 @@ namespace RTS_1333
         };
 
         // Called once at the start.
-        private void Start()
+        private void Initialize()
         {
             // Clear any existing armies.
             _armies.Clear();
@@ -95,7 +95,7 @@ namespace RTS_1333
                     // Get the UnitInstance component.
                     UnitInstance unit = go.GetComponent<UnitInstance>();
                     // Initialize the unit with its pathfinder and type.
-                    unit.Initialize(pathfinder, entry.unitTypePrefab.unitType);
+                    unit.Initialize(pathfinder);
                     // Add to the army's unit list.
                     army.Units.Add(unit);
                     // Initialize state to Patrol.

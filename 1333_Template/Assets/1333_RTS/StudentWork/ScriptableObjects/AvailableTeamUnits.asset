@@ -9,14 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5d66b386076409098077e52e555896b, type: 3}
-  m_Name: U_CalvalryRegular
+  m_Script: {fileID: 11500000, guid: 6a49fdebe0c349b78033571b7d1a1fd8, type: 3}
+  m_Name: AvailableTeamUnits
   m_EditorClassIdentifier: 
-  _width: 2
-  _height: 2
-  _maxHp: 200
-  _moveSpeed: 2
-  _damage: 10
-  _defence: 8
-  _attackType: 0
-  _range: 1
+  AvailableUnits:
+  - {fileID: 11400000, guid: 61ac369f689334ddaa8dfd0f48e2f19f, type: 2}

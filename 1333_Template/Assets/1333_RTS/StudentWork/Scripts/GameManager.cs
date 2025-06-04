@@ -91,7 +91,14 @@ namespace RTS_1333
 		[Header("Randomization Settings")]
 		[SerializeField] private float _markerHeight = 0.5f;
 
-
+#if false
+        [SerializeField] private ArmyPathfindingTester _armyPathfindingTester;
+#endif
+        
+        [SerializeField] private AvailableTeamUnits _availableTeamUnits;
+        
+        private TeamArmies AllArmies = new TeamArmies();
+        
 		/// <summary>
 		/// Called when the GameManager script instance is being loaded.
 		/// Ensures that all necessary components and references are properly initialized before the game starts.
@@ -115,7 +122,24 @@ namespace RTS_1333
 			_gridManager.InitializeGrid();
 			_unitManager.SpawnDummyUnit(_startMarker);
 			_unitManager.SpawnDummyUnit(_endMarker);
+            
+            #if false
+            _armyPathfindingTester.Initialize();
+            #endif
+            
+            
+            
 			RandomizeAndPathFind();
+            
+            
+            // Find out how many armies are in the game
+            // hardcoding to 4
+            for (int i = 0; i < 4; i++)
+            {
+                AllArmies.Teams.Add(new CurrentTeamArmyManager());
+            }
+            
+            
 		}
 
 		/// <summary>
@@ -154,6 +178,11 @@ namespace RTS_1333
 			{
 				RandomizeAndPathFind();
 			}
+
+            foreach (var team in AllArmies.Teams)
+            {
+                team.UpdateAllUnits();
+            }
 		}
 
 		/// <summary>
@@ -166,21 +195,28 @@ namespace RTS_1333
 		/// - Intended to be executed both during initialization and reacting to user input.
 		/// </remarks>
 		private void RandomizeAndPathFind()
-		{
-			RandomizeAll();
-			// Find and visualize path
-			var path = _pathfinder.FindPath(_startMarker.position, _endMarker.position);
-			string msg = $"Path found: {path.Count} steps. Start at {_startMarker.position}, end at {_endMarker.position}.\nStart at";
-			foreach (var p in path)
-			{
-				msg += $"\n> {p.WorldPosition}";
-			}
+        {
+            RandomizeAll();
+            _testUnit.transform.position = _startMarker.position;
+            _testUnit.SetTarget(_endMarker.position);
+            //TestPathfinderNoUnits();
+        }
 
-			msg += $" > end at {_endMarker.position}.";
-			Debug.Log(msg);
-		}
+        private void TestPathfinderNoUnits()
+        {
+            // Find and visualize path
+            var path = _pathfinder.FindPath(_startMarker.position, _endMarker.position);
+            string msg = $"Path found: {path.Count} steps. Start at {_startMarker.position}, end at {_endMarker.position}.\nStart at";
+            foreach (var p in path)
+            {
+                msg += $"\n> {p.WorldPosition}";
+            }
 
-		/// <summary>
+            msg += $" > end at {_endMarker.position}.";
+            Debug.Log(msg);
+        }
+
+        /// <summary>
 		/// Randomizes all game elements controlled by the GameManager.
 		/// This includes invoking terrain randomization within the grid and modifying markers.
 		/// </summary>
