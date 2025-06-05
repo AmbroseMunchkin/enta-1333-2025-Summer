@@ -22,19 +22,19 @@ namespace RTS_1333
         /// The height of the unit in grid cells (for large units).
         /// </summary>
         public virtual int Height => _unitType != null ? _unitType.Height : 1;
+
+		public int MaxHp => _unitType.MaxHp;
+		protected int CurrentHp;
+		public int Hp => CurrentHp;
         
-        protected Pathfinder _pathfinder; // Reference to the Pathfinder.
-        protected List<GridNode> _currentPath = new(); // The current path to follow.
-        protected int _pathIndex = 0; // Current waypoint index.
+        protected Pathfinder Pathfinder; // Reference to the Pathfinder.
+        protected int PathIndex = 0; // Current waypoint index.
         
-        protected Vector3? _targetWorldPosition = null; // The current target position.
-        protected bool _isMoving = false; // Is the unit currently moving?
+        protected Vector3? TargetWorldPosition = null; // The current target position.
 
         // Public property to check if the unit is currently moving.
-        public bool IsMoving => _isMoving;
-
-        // Public property to expose the current path for visualization.
-        public List<GridNode> CurrentPath => _currentPath;
+		public bool IsMoving;
+		public List<GridNode> CurrentPath = new(); // The current path to follow.
 
         protected UnitState State;
         
@@ -45,7 +45,8 @@ namespace RTS_1333
         public abstract void MoveTo(GridNode targetNode);
 
         public virtual void Tick()
-        {
+		{
+			CheckState();
             switch (State)
             {
                 case UnitState.Moving:
@@ -57,29 +58,68 @@ namespace RTS_1333
             }
         }
 
+		protected virtual void CheckState()
+		{
+			if (CurrentPath == null || CurrentPath.Count == 0 || PathIndex >= CurrentPath.Count)
+			{
+				State = UnitState.Nothing; // Reset state when not moving
+				return;
+			}
+
+			// Set state to moving
+			State = UnitState.Moving;
+		}
+
         public virtual void DoMove()
         {
             // If not moving or no path, do nothing.
-            if (!_isMoving || _currentPath == null || _currentPath.Count == 0 || _pathIndex >= _currentPath.Count)
+            if (!IsMoving || CurrentPath == null || CurrentPath.Count == 0 || PathIndex >= CurrentPath.Count)
+            {
+                State = UnitState.Nothing; // Reset state when not moving
                 return;
+            }
 
-            // Get the next waypoint.
-            Vector3 nextWaypoint = _currentPath[_pathIndex].WorldPosition;
-            // Move towards the waypoint.
+            // Set state to moving
+            State = UnitState.Moving;
+
+            // Get the next waypoint
+            Vector3 nextWaypoint = CurrentPath[PathIndex].WorldPosition;
+            
+            // Calculate direction to waypoint
             Vector3 direction = (nextWaypoint - transform.position).normalized;
+            
+            // Calculate rotation
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _unitType.MoveSpeed * Time.deltaTime);
+            
+            // Move towards waypoint
             float step = _unitType.MoveSpeed * Time.deltaTime;
             transform.position = Vector3.MoveTowards(transform.position, nextWaypoint, step);
 
-            // Check if reached the waypoint.
+            // Check if reached the waypoint
             if (Vector3.Distance(transform.position, nextWaypoint) < 0.05f)
             {
-                _pathIndex++;
-                // If reached the end of the path, stop moving.
-                if (_pathIndex >= _currentPath.Count)
+                PathIndex++;
+                // If reached the end of the path, stop moving
+                if (PathIndex >= CurrentPath.Count)
                 {
-                    _isMoving = false;
+                    IsMoving = false;
+                    State = UnitState.Nothing;
                 }
             }
         }
+
+		/// <summary>
+		/// Sets a new movement target for the unit (world position).
+		/// </summary>
+		public virtual void SetTarget(Vector3 worldPosition)
+		{
+			// Store the target.
+			TargetWorldPosition = worldPosition;
+			// Request a path from Pathfinder.
+			CurrentPath = Pathfinder.FindPath(transform.position, worldPosition, Width, Height);
+			PathIndex = 0;
+			IsMoving = CurrentPath != null && CurrentPath.Count > 1;
+		}
     }
 } 

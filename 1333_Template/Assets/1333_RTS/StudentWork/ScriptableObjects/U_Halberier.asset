@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a5d66b386076409098077e52e555896b, type: 3}
-  m_Name: U_Spearman
+  m_Name: U_Halberier
   m_EditorClassIdentifier: 
   _width: 1
   _height: 1
   _maxHp: 100
   _moveSpeed: 1
   _damage: 20
-  _defence: 2
+  _defence: 5
   _attackType: 0
   _range: 2
-  _unitPrefab: {fileID: 7442038812242999180, guid: 808a76c06eb184b488daa0af816593db, type: 3}
+  _unitPrefab: {fileID: 7442038812242999180, guid: 6b0f286547e656a46a1acb9d76778080, type: 3}

@@ -42,7 +42,7 @@ namespace RTS_1333
         };
 
         // Called once at the start.
-        private void Initialize()
+        public void Initialize()
         {
             // Clear any existing armies.
             _armies.Clear();
@@ -71,8 +71,8 @@ namespace RTS_1333
                     int maxAttempts = 1000;
                     Vector3 spawnPos = Vector3.zero;
                     bool found = false;
-                    int unitWidth = entry.unitTypePrefab.unitType.Width;
-                    int unitHeight = entry.unitTypePrefab.unitType.Height;
+                    int unitWidth = entry.UnitConfig.Width;
+                    int unitHeight = entry.UnitConfig.Height;
                     // Try to find a valid spawn position.
                     while (!found && attempts < maxAttempts)
                     {
@@ -87,15 +87,14 @@ namespace RTS_1333
                     }
                     if (!found)
                     {
-                        Debug.LogWarning($"Failed to find valid spawn position for unit {entry.unitTypePrefab.unitType.name}.");
+                        Debug.LogWarning($"Failed to find valid spawn position for unit {entry.UnitConfig.name}.");
                         continue;
                     }
                     // Instantiate the unit prefab at the spawn position.
-                    GameObject go = Instantiate(entry.unitTypePrefab.prefab, spawnPos, Quaternion.identity);
+					UnitInstance unit = Instantiate(entry.UnitConfig.Prefab, spawnPos, Quaternion.identity);
                     // Get the UnitInstance component.
-                    UnitInstance unit = go.GetComponent<UnitInstance>();
                     // Initialize the unit with its pathfinder and type.
-                    unit.Initialize(pathfinder);
+                    unit.Initialize(pathfinder, army.ArmyID);
                     // Add to the army's unit list.
                     army.Units.Add(unit);
                     // Initialize state to Patrol.
@@ -203,6 +202,7 @@ namespace RTS_1333
                         }
                         break;
                 }
+				unit.Tick();
             }
         }
 

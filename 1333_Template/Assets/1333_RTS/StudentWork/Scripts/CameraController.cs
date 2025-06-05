@@ -87,37 +87,38 @@ public class CameraController : MonoBehaviour
     // Handles camera movement with WASD and screen edge
     private void HandleMovement()
     {
-        // Start with current target position
-        Vector3 pos = _targetPosition;
+        Vector3 inputDirection = Vector3.zero;
 
-        // Move forward (W key or mouse at top edge)
         if (Input.GetKey("w") || (IsMouseInViewport() && Input.mousePosition.y >= Screen.height - panBorderThickness))
-        {
-            pos.z += panSpeed * Time.deltaTime;
-        }
-        // Move backward (S key or mouse at bottom edge)
+            inputDirection += Vector3.forward;
+
         if (Input.GetKey("s") || (IsMouseInViewport() && Input.mousePosition.y <= panBorderThickness))
-        {
-            pos.z -= panSpeed * Time.deltaTime;
-        }
-        // Move right (D key or mouse at right edge)
+            inputDirection += Vector3.back;
+
         if (Input.GetKey("d") || (IsMouseInViewport() && Input.mousePosition.x >= Screen.width - panBorderThickness))
-        {
-            pos.x += panSpeed * Time.deltaTime;
-        }
-        // Move left (A key or mouse at left edge)
+            inputDirection += Vector3.right;
+
         if (Input.GetKey("a") || (IsMouseInViewport() && Input.mousePosition.x <= panBorderThickness))
-        {
-            pos.x -= panSpeed * Time.deltaTime;
-        }
+            inputDirection += Vector3.left;
 
-        // Clamp X position within min and max limits
-        pos.x = Mathf.Clamp(pos.x, panLimitMin.x, panLimitMax.x);
-        // Clamp Z position within min and max limits
-        pos.z = Mathf.Clamp(pos.z, panLimitMin.y, panLimitMax.y);
+        if (inputDirection == Vector3.zero)
+            return;
 
-        // Set the new target position
-        _targetPosition = pos;
+        // Normalize to avoid faster diagonal movement
+        inputDirection.Normalize();
+
+        // Get camera-relative directions
+        Vector3 forward = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
+        Vector3 right = Vector3.ProjectOnPlane(transform.right, Vector3.up).normalized;
+
+        // Calculate movement vector relative to camera's orientation
+        Vector3 moveDirection = forward * inputDirection.z + right * inputDirection.x;
+
+        _targetPosition += moveDirection * panSpeed * Time.deltaTime;
+
+        // Clamp the new position within limits
+        _targetPosition.x = Mathf.Clamp(_targetPosition.x, panLimitMin.x, panLimitMax.x);
+        _targetPosition.z = Mathf.Clamp(_targetPosition.z, panLimitMin.y, panLimitMax.y);
     }
 
     // Handles camera zoom with mouse wheel

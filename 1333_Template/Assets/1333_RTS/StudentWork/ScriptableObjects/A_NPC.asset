@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: A_NPC
   m_EditorClassIdentifier: 
   units:
-  - unitTypePrefab:
-      unitType: {fileID: 11400000, guid: aa5683cd63fad1143888570046b15afd, type: 2}
-      prefab: {fileID: 4176176975939733581, guid: 6668a9a4397ade04e9afe504f3b3335b, type: 3}
+  - UnitConfig: {fileID: 11400000, guid: 61ac369f689334ddaa8dfd0f48e2f19f, type: 2}
+    count: 3
+  - UnitConfig: {fileID: 11400000, guid: 9de738708ea651e44991d2dea1693eac, type: 2}
     count: 2
-  - unitTypePrefab:
-      unitType: {fileID: 11400000, guid: ca3ff9c31e21c024fac2aff493ef6200, type: 2}
-      prefab: {fileID: 2903582494157673995, guid: 1cec3970da8c95e4a990892a256786c6, type: 3}
-    count: 2
+  - UnitConfig: {fileID: 11400000, guid: 9873cb09653022c4f8f2b787caaf510f, type: 2}
+    count: 1
+  - UnitConfig: {fileID: 11400000, guid: ca3ff9c31e21c024fac2aff493ef6200, type: 2}
+    count: 1

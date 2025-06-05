@@ -24,17 +24,6 @@ namespace RTS_1333
 		[SerializeField] private GridManager _gridManager;
 
 		/// <summary>
-		/// The _unitManager variable is an instance of the UnitManager class.
-		/// It is responsible for managing the game's units, including their spawning, placement, and interactions within the game.
-		/// This reference enables the GameManager to coordinate unit-related functionality through UnitManager methods.
-		/// </summary>
-		/// <remarks>
-		/// Declared as private and serialized, this variable can be set in the Unity Editor to reference a UnitManager component.
-		/// This ensures seamless communication between the GameManager and UnitManager during gameplay scenarios.
-		/// </remarks>
-		[SerializeField] private UnitManager _unitManager;
-
-		/// <summary>
 		/// The pathfinder variable is an instance of the Pathfinder class.
 		/// It is responsible for determining optimal paths between points in the game environment.
 		/// This variable facilitates interaction with different pathfinding algorithms that can be customized or selected
@@ -90,14 +79,11 @@ namespace RTS_1333
 		/// </remarks>
 		[Header("Randomization Settings")]
 		[SerializeField] private float _markerHeight = 0.5f;
-
-#if false
+		
+		/// <summary>
+		/// Tests armies
+		/// </summary>
         [SerializeField] private ArmyPathfindingTester _armyPathfindingTester;
-#endif
-        
-        [SerializeField] private AvailableTeamUnits _availableTeamUnits;
-        
-        private TeamArmies AllArmies = new TeamArmies();
         
 		/// <summary>
 		/// Called when the GameManager script instance is being loaded.
@@ -120,26 +106,10 @@ namespace RTS_1333
 			}
 
 			_gridManager.InitializeGrid();
-			_unitManager.SpawnDummyUnit(_startMarker);
-			_unitManager.SpawnDummyUnit(_endMarker);
-            
-            #if false
+			
             _armyPathfindingTester.Initialize();
-            #endif
-            
-            
-            
+			
 			RandomizeAndPathFind();
-            
-            
-            // Find out how many armies are in the game
-            // hardcoding to 4
-            for (int i = 0; i < 4; i++)
-            {
-                AllArmies.Teams.Add(new CurrentTeamArmyManager());
-            }
-            
-            
 		}
 
 		/// <summary>
@@ -178,11 +148,6 @@ namespace RTS_1333
 			{
 				RandomizeAndPathFind();
 			}
-
-            foreach (var team in AllArmies.Teams)
-            {
-                team.UpdateAllUnits();
-            }
 		}
 
 		/// <summary>
@@ -197,9 +162,6 @@ namespace RTS_1333
 		private void RandomizeAndPathFind()
         {
             RandomizeAll();
-            _testUnit.transform.position = _startMarker.position;
-            _testUnit.SetTarget(_endMarker.position);
-            //TestPathfinderNoUnits();
         }
 
         private void TestPathfinderNoUnits()

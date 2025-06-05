@@ -282,6 +282,8 @@ MonoBehaviour:
   minRotation: 30
   maxRotation: 90
   rotationSmoothness: 10
+  panDragSpeed: 0.5
+  rotationSensitivity: 0.2
 --- !u!1 &339223582
 GameObject:
   m_ObjectHideFlags: 0
@@ -327,12 +329,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _gridManager: {fileID: 375532234}
-  _unitManager: {fileID: 507953957}
   _pathfinder: {fileID: 457148306}
   _startMarker: {fileID: 930347419}
   _endMarker: {fileID: 582253290}
   _pathLine: {fileID: 1832975254}
   _markerHeight: 0.5
+  _armyPathfindingTester: {fileID: 1851829047}
 --- !u!1 &375532233
 GameObject:
   m_ObjectHideFlags: 0
@@ -543,51 +545,6 @@ MonoBehaviour:
   pathfindingToUse: 1
   algorithmVariant: 1
   gridManager: {fileID: 375532234}
---- !u!1 &507953955
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 507953956}
-  - component: {fileID: 507953957}
-  m_Layer: 0
-  m_Name: UnitManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &507953956
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 507953955}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &507953957
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 507953955}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7c73ee2082d19641baa2df672d93823, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _gridManager: {fileID: 375532234}
 --- !u!1 &582253289
 GameObject:
   m_ObjectHideFlags: 0
@@ -1184,7 +1141,6 @@ SceneRoots:
   - {fileID: 375532235}
   - {fileID: 339223583}
   - {fileID: 457148305}
-  - {fileID: 507953956}
   - {fileID: 930347419}
   - {fileID: 582253290}
   - {fileID: 1832975255}
