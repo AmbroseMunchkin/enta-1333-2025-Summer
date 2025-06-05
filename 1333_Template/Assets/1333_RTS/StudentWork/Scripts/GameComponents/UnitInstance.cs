@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace RTS_1333
 {
@@ -83,6 +82,8 @@ namespace RTS_1333
 		/// will safely ignore triggering particles.
 		/// </remarks>
 		[SerializeField] private ParticleSystem _hurtParticles;
+		
+		private UnitData _unitData;
 
 		/// <summary>
 		/// Initializes the unit with necessary data such as pathfinder, initial health, and army-specific settings.
@@ -102,6 +103,24 @@ namespace RTS_1333
 					r.material = skin;
 			}
 
+			UpdateAnimatorParameters();
+		}
+		
+		public void Initialize(Pathfinder pathfinder, UnitData data)
+		{
+			Pathfinder = pathfinder;
+			_unitData = data;
+			CurrentHp = data.Health > 0 ? data.Health : data.UnitType.MaxHp;
+			transform.position = data.Position;
+			
+			// Skin logic.
+			if (ArmyData.ArmySettingsLookup.TryGetValue(data.ArmyId, out var setting))
+			{
+				Material skin = setting.UnitSkin;
+				foreach (var r in _unitSkins.GetComponentsInChildren<SkinnedMeshRenderer>())
+					r.material = skin;
+			}
+			
 			UpdateAnimatorParameters();
 		}
 
@@ -147,9 +166,12 @@ namespace RTS_1333
 				CurrentHp = 0;
 				_characterAnimator.SetBool(Alive, false);
 			}
+			else
+			{
+				_characterAnimator.SetTrigger(Hurt);
+			}
 
 			_hurtParticles?.Play();
-			_characterAnimator.SetTrigger(Hurt);
 		}
 
 		/// <summary>
@@ -160,6 +182,11 @@ namespace RTS_1333
 		{
 			_characterAnimator.SetFloat(Speed, IsMoving ? _unitType.MoveSpeed : 0f);
 			_characterAnimator.SetBool(Alive, CurrentHp > 0);
+		}
+
+		private void Update()
+		{
+			Tick();
 		}
 
 		/// <summary>
@@ -177,5 +204,24 @@ namespace RTS_1333
 			// Update animation parameters based on movement state
 			UpdateAnimatorParameters();
 		}
+		
+		private void OnDrawGizmos()
+		{
+			if (CurrentPath == null || CurrentPath.Count < 2)
+				return;
+			
+			// Set gizmo color for this army.
+			Gizmos.color = _unitData.ArmyId < ArmyColors.Length ? ArmyColors[_unitData.ArmyId] : Color.black;
+			// Draw lines between each node in the path.
+			for (int i = 0; i < CurrentPath.Count - 1; i++)
+			{
+				Gizmos.DrawLine(CurrentPath[i].WorldPosition, CurrentPath[i + 1].WorldPosition);
+			}
+		}
+		
+		private static readonly Color[] ArmyColors = new Color[]
+		{
+			Color.cyan, Color.red, Color.yellow, Color.green, Color.magenta, Color.blue, Color.white, Color.black
+		};
 	}
 }

@@ -153,7 +153,6 @@ namespace RTS_1333
 		/// <param name="x">The x-coordinate of the node to retrieve. Represents the column index in the grid.</param>
 		/// <param name="y">The y-coordinate of the node to retrieve. Represents the row index in the grid.</param>
 		/// <returns>The GridNode object located at the specified coordinates within the grid.</returns>
-		/// <exception cref="IndexOutOfRangeException">Thrown if the specified coordinates are outside the bounds of the grid.</exception>
 		public GridNode GetNode(int x, int y)
 		{
 			// Ensure the requested coordinates are within grid bounds.

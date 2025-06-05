@@ -27,5 +27,12 @@ namespace RTS_1333
         /// </summary>
         /// <param name="targetNode">The target node to place the building on.</param>
         public abstract void PlaceAt(GridNode targetNode);
+		
+		public IArmyData Owner { get; private set; }
+
+		public void AssignToArmy(IArmyData owner)
+		{
+			Owner = owner;
+		}
     }
 } 

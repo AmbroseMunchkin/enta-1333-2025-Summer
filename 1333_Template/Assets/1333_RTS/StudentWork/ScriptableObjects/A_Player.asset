@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   units:
   - UnitConfig: {fileID: 11400000, guid: 61ac369f689334ddaa8dfd0f48e2f19f, type: 2}
-    count: 3
+    count: 40
   - UnitConfig: {fileID: 11400000, guid: 9de738708ea651e44991d2dea1693eac, type: 2}
-    count: 2
+    count: 30
   - UnitConfig: {fileID: 11400000, guid: 9873cb09653022c4f8f2b787caaf510f, type: 2}
-    count: 1
+    count: 20
   - UnitConfig: {fileID: 11400000, guid: ca3ff9c31e21c024fac2aff493ef6200, type: 2}
-    count: 1
+    count: 10

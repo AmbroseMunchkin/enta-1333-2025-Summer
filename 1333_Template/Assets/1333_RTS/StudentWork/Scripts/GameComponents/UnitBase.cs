@@ -26,11 +26,10 @@ namespace RTS_1333
 		public int MaxHp => _unitType.MaxHp;
 		protected int CurrentHp;
 		public int Hp => CurrentHp;
+		public bool IsDead => CurrentHp <= 0;
         
         protected Pathfinder Pathfinder; // Reference to the Pathfinder.
         protected int PathIndex = 0; // Current waypoint index.
-        
-        protected Vector3? TargetWorldPosition = null; // The current target position.
 
         // Public property to check if the unit is currently moving.
 		public bool IsMoving;
@@ -90,7 +89,7 @@ namespace RTS_1333
             
             // Calculate rotation
             Quaternion targetRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _unitType.MoveSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _unitType.MoveSpeed * 5f * Time.deltaTime);
             
             // Move towards waypoint
             float step = _unitType.MoveSpeed * Time.deltaTime;
@@ -114,12 +113,10 @@ namespace RTS_1333
 		/// </summary>
 		public virtual void SetTarget(Vector3 worldPosition)
 		{
-			// Store the target.
-			TargetWorldPosition = worldPosition;
 			// Request a path from Pathfinder.
 			CurrentPath = Pathfinder.FindPath(transform.position, worldPosition, Width, Height);
 			PathIndex = 0;
 			IsMoving = CurrentPath != null && CurrentPath.Count > 1;
 		}
-    }
+	}
 } 

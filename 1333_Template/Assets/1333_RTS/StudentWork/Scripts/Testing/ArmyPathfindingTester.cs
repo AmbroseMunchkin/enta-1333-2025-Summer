@@ -21,7 +21,7 @@ namespace RTS_1333
         [SerializeField] private float detectionRange = 4f;
 
         // List of all army managers in the scene.
-        private readonly List<ArmyManager> _armies = new();
+        private readonly List<ArmyData> _armies = new();
         // State for each unit.
         private enum UnitState { Patrol, Follow }
         // Dictionary to track each unit's state.
@@ -50,16 +50,16 @@ namespace RTS_1333
             for (int i = 0; i < armyCompositions.Count; i++)
             {
                 // Create a new army manager.
-                ArmyManager army = new ArmyManager { ArmyID = i + 1, GridManager = gridManager };
+                //ArmyManager army = new ArmyManager { ArmyID = i + 1, GridManager = gridManager };
                 // Spawn all units for this army.
-                SpawnArmyUnits(army, armyCompositions[i]);
+                //SpawnArmyUnits(army, armyCompositions[i]);
                 // Add to the list of armies.
-                _armies.Add(army);
+                //_armies.Add(army);
             }
         }
 
         // Spawns units for a given army, placing them at random valid positions.
-        private void SpawnArmyUnits(ArmyManager army, ArmyComposition composition)
+        private void SpawnArmyUnits(ArmyData army, ArmyComposition composition)
         {
             // Loop through each unit entry in the composition.
             foreach (var entry in composition.units)
@@ -96,7 +96,7 @@ namespace RTS_1333
                     // Initialize the unit with its pathfinder and type.
                     unit.Initialize(pathfinder, army.ArmyID);
                     // Add to the army's unit list.
-                    army.Units.Add(unit);
+                    //army.Units.Add(unit);
                     // Initialize state to Patrol.
                     _unitStates[unit] = UnitState.Patrol;
                     // Pick two random patrol points within patrolRange.
@@ -148,7 +148,7 @@ namespace RTS_1333
             // For each army, update its units against all other armies.
             for (int i = 0; i < _armies.Count; i++)
             {
-                ArmyManager ownArmy = _armies[i];
+                ArmyData ownArmy = _armies[i];
                 // Build a list of all enemy units (from all other armies).
                 List<UnitInstance> enemyUnits = new();
                 for (int j = 0; j < _armies.Count; j++)
@@ -161,7 +161,7 @@ namespace RTS_1333
         }
 
         // Updates all units in one army, checking for enemy detection and state transitions.
-        private void UpdateArmyUnits(ArmyManager ownArmy, List<UnitInstance> enemyUnits)
+        private void UpdateArmyUnits(ArmyData ownArmy, List<UnitInstance> enemyUnits)
         {
             foreach (UnitInstance unit in ownArmy.Units)
             {
@@ -254,7 +254,7 @@ namespace RTS_1333
             // Loop through all armies.
             for (int armyIdx = 0; armyIdx < _armies.Count; armyIdx++)
             {
-                ArmyManager army = _armies[armyIdx];
+                ArmyData army = _armies[armyIdx];
                 // Pick a color for this army.
                 Color color = ArmyColors[armyIdx % ArmyColors.Length];
                 // Loop through all units in the army.
