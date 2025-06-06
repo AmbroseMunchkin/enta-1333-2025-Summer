@@ -7,13 +7,21 @@ namespace RTS_1333
 	{
 		private void OnEnable()
 		{
-			DebugLogConsole.AddCommand<string, int, float, float>("SpawnUnit", "Spawn a unit of a type, into a specific army, at a given x,z coordinate", ArmySpawn, "Unit Type", "Army ID", "X", "Z");
 			DebugLogConsole.AddCommand<int>("NewGame", "Begins a new game, initializing armies and units", StartNewGame, "Number of armies");
+			DebugLogConsole.AddCommand<string, int, float, float>("SpawnUnit", "Spawn a unit of a type, into a specific army, at a given x,z coordinate", ArmySpawn, "Unit Type", "Army ID", "X", "Z");
+			DebugLogConsole.AddCommand<string, int>("PlaceBuilding", "Goes into building placement mode", PlaceBuilding, "Type of building to place", "Army to place it for.");
 		}
 
 		private void OnDisable()
 		{
+			DebugLogConsole.RemoveCommand("NewGame");
 			DebugLogConsole.RemoveCommand("SpawnUnit");
+			DebugLogConsole.RemoveCommand("PlaceBuilding");
+		}
+		
+		private static void StartNewGame(int numOfArmies)
+		{
+			GameManager.Instance.StartNewGame(numOfArmies);
 		}
 
 		private static void ArmySpawn(string unitTypeName, int armyId, float x, float z)
@@ -44,9 +52,23 @@ namespace RTS_1333
 			Debug.Log($"Spawned {unitTypeName} at ({x}, {z}) in Army {armyId}");
 		}
 
-		private static void StartNewGame(int numOfArmies)
+		
+		private static void PlaceBuilding(string buildingTypeName, int armyId)
 		{
-			GameManager.Instance.StartNewGame(numOfArmies);
+			var buildingType = Resources.Load<BuildingType>($"BuildingTypes/{buildingTypeName}");
+			if (buildingType == null)
+			{
+				Debug.LogError($"Invalid building type: {buildingTypeName}");
+				return;
+			}
+
+			if (!AllArmiesManager.Instance.TryGetArmy(armyId, out var army))
+			{
+				Debug.LogError($"No army registered with ID {armyId}");
+				return;
+			}
+
+			BuildingPlacementManager.Instance.BeginPlacement(buildingType, army);
 		}
 	}
 }

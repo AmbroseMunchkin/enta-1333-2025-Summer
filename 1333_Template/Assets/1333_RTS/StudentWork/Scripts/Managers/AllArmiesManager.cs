@@ -17,8 +17,9 @@ namespace RTS_1333
 		void InitializeFromData(List<UnitData> data);
 
 		void SpawnUnit(UnitData data);
-		void AddBuilding(BuildingBase building);
 		void RemoveDeadUnits();
+		void AddBuilding(BuildingBase building);
+		void RemoveBuilding(BuildingBase building);
 	}
 
 	public class AllArmiesManager : MonoBehaviour
@@ -110,14 +111,7 @@ namespace RTS_1333
 			_units.Add(instance);
 		}
 
-		public void AddBuilding(BuildingBase building)
-		{
-			if (!_buildings.Contains(building))
-			{
-				_buildings.Add(building);
-				building.AssignToArmy(this);
-			}
-		}
+		
 
 		public void RemoveDeadUnits()
 		{
@@ -125,6 +119,17 @@ namespace RTS_1333
 		}
 
 
+		
+		
+
+		private void ClearUnits()
+		{
+			foreach (var unit in _units)
+				if (unit != null)
+					Object.Destroy(unit.gameObject);
+			_units.Clear();
+		}
+		
 		public void SpawnBuilding(BuildingType type, Vector3 worldPosition)
 		{
 			if (type == null || type.Prefab == null)
@@ -133,16 +138,43 @@ namespace RTS_1333
 				return;
 			}
 
-			var building = Object.Instantiate(type.Prefab, worldPosition, Quaternion.identity);
+			Vector2Int origin = GridManager.GetNodeFromWorldPosition(worldPosition).Coordinates;
+
+			if (!GridManager.CanPlaceBuilding(type, origin))
+			{
+				Debug.Log("Invalid building placement");
+				return;
+			}
+
+			// Snap to grid
+			Vector3 worldCenter = GridManager.GetNode(origin.x, origin.y).WorldPosition;
+
+			var building = Object.Instantiate(type.Prefab, worldCenter, Quaternion.identity);
+			building.Initialize(type, origin);
+			building.AssignToArmy(this);
+
+			GridManager.PlaceBuilding(building);
 			AddBuilding(building);
 		}
-
-		private void ClearUnits()
+		
+		public void AddBuilding(BuildingBase building)
 		{
-			foreach (var unit in _units)
-				if (unit != null)
-					Object.Destroy(unit.gameObject);
-			_units.Clear();
+			if (!_buildings.Contains(building))
+			{
+				_buildings.Add(building);
+				// todo
+				building.AssignToArmy(this);
+			}
+		}
+
+		public void RemoveBuilding(BuildingBase building)
+		{
+			if (_buildings.Contains(building))
+			{
+				_buildings.Remove(building);
+				GridManager.RemoveBuilding(building);
+				Object.Destroy(building.gameObject);
+			}
 		}
 
 		public void Dispose()

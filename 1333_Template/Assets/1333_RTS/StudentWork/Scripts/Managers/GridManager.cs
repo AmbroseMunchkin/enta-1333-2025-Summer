@@ -20,32 +20,18 @@ namespace RTS_1333
 		/// <summary>
 		/// Provides configuration settings for the grid system used in the game.
 		/// </summary>
-		/// <remarks>
-		/// Contains customizable parameters like grid dimensions, node size, orientation,
-		/// default terrain type, and supported terrain types. This data drives the
-		/// grid's structure and behavior.
-		/// </remarks>
 		public GridSettings GridSettings => _gridSettings;
 
 		/// <summary>
 		/// A 2D private array used to store and organize grid nodes, where each element represents a node
 		/// at a specific position defined by its row and column indices.
 		/// </summary>
-		/// <remarks>
-		/// Serves as the underlying data structure in the grid system created by the GridManager.
-		/// Each node in the array encapsulates information such as position, walkability, weight, and terrain type.
-		/// </remarks>
 		private GridNode[,] _gridNodes;
 
 		/// <summary>
 		/// A list containing references to all GridNode objects in the grid.
 		/// This list is primarily used for debugging purposes in the Unity editor.
 		/// </summary>
-		/// <remarks>
-		/// The AllNodes list is populated during the grid initialization process and includes
-		/// every GridNode from the entire grid. It allows for easier visualization
-		/// and manipulation of grid nodes during development and debugging.
-		/// </remarks>
 		[Header("Debug for editor playmode only")] // Adds a header in the Unity inspector.
 		[SerializeField]
 		private List<GridNode> AllNodes = new(); // Contains all grid nodes in a single list for easier debugging.
@@ -53,30 +39,16 @@ namespace RTS_1333
 		/// <summary>
 		/// Indicates whether the grid system has been successfully initialized.
 		/// </summary>
-		/// <remarks>
-		/// This property is set to true after the grid has been fully created and all nodes have been
-		/// initialized. It provides a quick way to check if the grid is ready for use, ensuring that
-		/// operations relying on the grid, such as spawning units, only execute when the grid is
-		/// prepared.
-		/// </remarks>
 		public bool IsInitialized { get; private set; } // Indicates if the grid data is ready to use.
+		
+		/// <summary>
+		/// Tracks buildings that occupy grid nodes.
+		/// </summary>
+		private readonly Dictionary<Vector2Int, BuildingInstance> _buildingOccupancy = new();
 
 		/// <summary>
 		/// Initializes the grid and populates it with GridNode objects using configured grid settings.
 		/// </summary>
-		/// <remarks>
-		/// This method creates a two-dimensional array of GridNode objects based on the grid size
-		/// defined in GridSettings. It ensures that each cell in the grid is instantiated
-		/// and ready to use. Once the initialization is complete, the grid is marked as initialized.
-		/// </remarks>
-		/// <example>
-		/// Proper implementation of this method requires valid `GridSettings` to be assigned.
-		/// Each node in the grid will correspond to a location determined by the grid dimensions.
-		/// </example>
-		/// <exception cref="System.NullReferenceException">
-		/// Thrown if required references, such as GridSettings, have not been set.
-		/// Ensure that all dependencies are assigned via the Unity inspector or code before invoking.
-		/// </exception>
 		public void InitializeGrid()
 		{
 			// Create a 2D array for the grid using dimensions defined in GridSettings.
@@ -285,5 +257,61 @@ namespace RTS_1333
 			// Return the node at the clamped coordinates.
 			return GetNode(x, y);
 		}
+		
+		
+		
+		
+		
+		public bool CanPlaceBuilding(BuildingType type, Vector2Int origin)
+		{
+			for (int dx = 0; dx < type.Width; dx++)
+			{
+				for (int dy = 0; dy < type.Height; dy++)
+				{
+					Vector2Int pos = origin + new Vector2Int(dx, dy);
+					if (!IsValidCoordinate(pos.x, pos.y) || _buildingOccupancy.ContainsKey(pos))
+						return false;
+				}
+			}
+			return true;
+		}
+
+		public void PlaceBuilding(BuildingInstance instance)
+		{
+			Vector2Int origin = instance.OriginPoint;
+			BuildingType type = instance.Type;
+			for (int dx = 0; dx < type.Width; dx++)
+			{
+				for (int dy = 0; dy < type.Height; dy++)
+				{
+					Vector2Int pos = origin + new Vector2Int(dx, dy);
+					_buildingOccupancy[pos] = instance;
+					if (type.IsSolid)
+						SetWalkable(pos.x, pos.y, false);
+				}
+			}
+		}
+
+		public void RemoveBuilding(BuildingBase instance)
+		{
+			Vector2Int origin = instance.OriginPoint;
+			BuildingType type = instance.Type;
+			for (int dx = 0; dx < type.Width; dx++)
+			{
+				for (int dy = 0; dy < type.Height; dy++)
+				{
+					Vector2Int pos = origin + new Vector2Int(dx, dy);
+					_buildingOccupancy.Remove(pos);
+					if (type.IsSolid)
+						SetWalkable(pos.x, pos.y, true);
+				}
+			}
+		}
+
+		public bool IsOccupied(Vector2Int pos)
+		{
+			return _buildingOccupancy.ContainsKey(pos);
+		}
+
 	}
 }
