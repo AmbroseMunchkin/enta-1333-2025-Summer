@@ -5,19 +5,42 @@ namespace RTS_1333
 {
 	public class DebugCommands : MonoBehaviour
 	{
+        [SerializeField] private GameManager _gameManager;
+        
 		private void OnEnable()
 		{
-			DebugLogConsole.AddCommand<int>("NewGame", "Begins a new game, initializing armies and units", StartNewGame, "Number of armies");
+			DebugLogConsole.AddCommand<int>("StartNewGame", "Begins a new game, initializing armies and units", StartNewGame, "Number of armies");
 			DebugLogConsole.AddCommand<string, int, float, float>("SpawnUnit", "Spawn a unit of a type, into a specific army, at a given x,z coordinate", ArmySpawn, "Unit Type", "Army ID", "X", "Z");
 			DebugLogConsole.AddCommand<string, int>("PlaceBuilding", "Goes into building placement mode", PlaceBuilding, "Type of building to place", "Army to place it for.");
+            
+            
+            
+            DebugLogConsole.AddCommand("HelloWorld", "Prints a message to the console.", HelloWorld);
+            DebugLogConsole.AddCommand<int>("NewGame", "Begins a new game, initializing armies and units", NewGame);
 		}
 
 		private void OnDisable()
 		{
-			DebugLogConsole.RemoveCommand("NewGame");
+			DebugLogConsole.RemoveCommand("StartNewGame");
 			DebugLogConsole.RemoveCommand("SpawnUnit");
 			DebugLogConsole.RemoveCommand("PlaceBuilding");
+            
+            
+            
+            DebugLogConsole.RemoveCommand("HelloWorld");
+            DebugLogConsole.RemoveCommand("NewGame");
 		}
+        
+        
+        private void NewGame(int numOfArmies)
+        {
+            _gameManager.StartNewGame(numOfArmies);
+        }
+
+        private void HelloWorld()
+        {
+            Debug.Log("Hello World");
+        }
 		
 		private static void StartNewGame(int numOfArmies)
 		{
