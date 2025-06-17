@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 namespace RTS_1333
@@ -80,7 +81,7 @@ namespace RTS_1333
 		/// </remarks>
 		[Header("Randomization Settings")]
 		[SerializeField] private float _markerHeight = 0.5f;
-		
+
 		[SerializeField] private AllArmiesManager _allArmies;
 
 		//[SerializeField] private ArmyPathfindingTester _armyPathfindingTester;
@@ -88,9 +89,9 @@ namespace RTS_1333
 		[SerializeField] private ArmyComposition _armyComposition;
 		[SerializeField] private GameObject _armyManagerPrefab;
 		[SerializeField] private int _defaultArmyCount = 2;
+		public static GameManager Instance { get; private set; }
 
-		private static GameManager _instance;
-		public static GameManager Instance => _instance;
+		public GridManager Grid => _gridManager;
 
 		/// <summary>
 		///     Called when the GameManager script instance is being loaded.
@@ -112,8 +113,8 @@ namespace RTS_1333
 				return;
 			}
 
-			_instance = this;
-			
+			Instance = this;
+
 			if (!ValidateReferences())
 			{
 				Debug.LogError(
@@ -240,29 +241,32 @@ namespace RTS_1333
 		public void StartNewGame(int armyCount)
 		{
 			Debug.Log($"[GameManager] Starting new game with {armyCount} armies.");
-			
+
 			var gridSizeX = _gridManager.GridSettings.GridSizeX;
 			var gridSizeY = _gridManager.GridSettings.GridSizeY;
 			var nodeSize = _gridManager.GridSettings.NodeSize;
-			
+
 			for (var i = 0; i < armyCount; i++)
 			{
 				var armyData = new ArmyData();
 				armyData.Initialize(_gridManager, _pathfinder, i, $"Faction_{i}");
 
 				// Example spawn for now: one unit in each army
+				/*
 				foreach (var unitComp in _armyComposition.units)
 				{
 					var startX = Random.Range(0, gridSizeX);
 					var startY = Random.Range(0, gridSizeY);
-					
+
 					var position = new Vector3(startX * nodeSize, 0, startY * nodeSize);
 					var unitData = new UnitData
 						{UnitType = unitComp.UnitConfig, Position = position, Health = unitComp.UnitConfig.MaxHp, ArmyId = i};
-					
+
 					armyData.SpawnUnit(unitData);
-				}
+				}*/
 			}
+
+			BuildingPlacementManager.Instance.Initialize(AllArmiesManager.Instance.AllArmies.FirstOrDefault());
 		}
 	}
 }

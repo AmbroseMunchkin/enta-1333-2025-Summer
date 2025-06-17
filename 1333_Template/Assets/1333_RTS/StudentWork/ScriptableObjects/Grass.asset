@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Grass
   m_EditorClassIdentifier: 
   _terrainName: Default
-  _gizmoColor: {r: 0, g: 1, b: 0, a: 0.19607843}
+  _gizmoColor: {r: 0, g: 0.8048496, b: 1, a: 0.19607843}
   _walkable: 1
   _movementCost: 1

@@ -1,23 +1,37 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SelectBuildingButton : MonoBehaviour
+namespace RTS_1333
 {
-    [SerializeField] private Image _buttonImage;
-    [SerializeField] private TMP_Text _buttonText;
-    [SerializeField] private Button _button;
+	public class SelectBuildingButton : MonoBehaviour
+	{
+		[SerializeField] private Image BuildingSprite;
+		[SerializeField] private TMP_Text BuildingText;
 
-    private BuildingData _buildingDataForButton;
-    
-    public void Setup(BuildingData buildingData)
-    {
-        _buildingDataForButton = buildingData;
+		private BuildingData _data;
+		private BuildingPlacementManager _manager;
 
-        _buttonText.text = _buildingDataForButton.BuildingName;
-        // optional
-        _buttonImage.sprite = _buildingDataForButton.BuildingIcon;
-    }
+		public void Setup(BuildingData data, BuildingPlacementManager manager)
+		{
+			if (data == null)
+			{
+				Debug.LogError("data is null");
+				Destroy(gameObject);
+				return;
+			}
+
+			_data = data;
+			_manager = manager;
+			// setup ui of the button
+			BuildingSprite.sprite = data.BuildingSprite;
+			BuildingText.text = data.BuildingName;
+		}
+
+		public void OnButtonSelected()
+		{
+			Debug.Log($"Selected {_data.BuildingName} to place");
+			_manager.OnNewBuildingSelected(_data);
+		}
+	}
 }

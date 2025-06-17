@@ -38,14 +38,14 @@ namespace RTS_1333
 
 		// Private fields for camera state
 		private Camera _cam; // Reference to the Camera component
-		private float _targetZoom; // Target camera height
+		private bool _isPanning; // Is the camera currently panning
+		private bool _isRotating; // Is the camera currently rotating
+		private Vector3 _lastMousePosition; // Last mouse position for rotation
+		private Vector3 _lastPanMousePosition; // Last mouse position for middle mouse panning
+		private Vector3 _targetPosition; // Target camera position
 		private float _targetRotation; // Target camera pitch
 		private float _targetYaw; // Target camera yaw (Y axis)
-		private Vector3 _lastMousePosition; // Last mouse position for rotation
-		private bool _isRotating; // Is the camera currently rotating
-		private Vector3 _targetPosition; // Target camera position
-		private Vector3 _lastPanMousePosition; // Last mouse position for middle mouse panning
-		private bool _isPanning; // Is the camera currently panning
+		private float _targetZoom; // Target camera height
 
 		private void Awake()
 		{
@@ -81,7 +81,7 @@ namespace RTS_1333
 		// Checks if the mouse is inside the game window
 		private bool IsMouseInViewport()
 		{
-			Vector3 mousePos = Input.mousePosition;
+			var mousePos = Input.mousePosition;
 			// Return true if mouse is within screen bounds
 			return mousePos.x >= 0 && mousePos.x <= Screen.width &&
 					mousePos.y >= 0 && mousePos.y <= Screen.height;
@@ -90,7 +90,7 @@ namespace RTS_1333
 		// Handles camera movement with WASD and screen edge
 		private void HandleMovement()
 		{
-			Vector3 inputDirection = Vector3.zero;
+			var inputDirection = Vector3.zero;
 
 			if (Input.GetKey("w") ||
 				(IsMouseInViewport() && Input.mousePosition.y >= Screen.height - panBorderThickness))
@@ -113,30 +113,32 @@ namespace RTS_1333
 			inputDirection.Normalize();
 
 			// Get camera-relative directions
-			Vector3 forward = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
-			Vector3 right = Vector3.ProjectOnPlane(transform.right, Vector3.up).normalized;
+			var forward = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
+			var right = Vector3.ProjectOnPlane(transform.right, Vector3.up).normalized;
 
 			// Calculate movement vector relative to camera's orientation
-			Vector3 moveDirection = forward * inputDirection.z + right * inputDirection.x;
+			var moveDirection = forward * inputDirection.z + right * inputDirection.x;
 
 			_targetPosition += moveDirection * panSpeed * Time.deltaTime;
 
 			// Clamp the new position within limits
-			_targetPosition.x = Mathf.Clamp(_targetPosition.x, 0, gridManager.GridSettings.GridSizeX * gridManager.GridSettings.NodeSize);
-			_targetPosition.z = Mathf.Clamp(_targetPosition.z, 0, gridManager.GridSettings.GridSizeY * gridManager.GridSettings.NodeSize);
+			_targetPosition.x = Mathf.Clamp(
+				_targetPosition.x, 0, gridManager.GridSettings.GridSizeX * gridManager.GridSettings.NodeSize);
+			_targetPosition.z = Mathf.Clamp(
+				_targetPosition.z, 0, gridManager.GridSettings.GridSizeY * gridManager.GridSettings.NodeSize);
 		}
 
 		// Handles camera zoom with mouse wheel
 		private void HandleZoom()
 		{
 			// Get mouse scroll wheel input
-			float scroll = Input.GetAxis("Mouse ScrollWheel");
+			var scroll = Input.GetAxis("Mouse ScrollWheel");
 			if (scroll != 0)
 			{
 				// Calculate how much height affects zoom speed (for natural feel)
-				float heightFactor = Mathf.Clamp01((_targetZoom - minZoom) / (maxZoom - minZoom));
+				var heightFactor = Mathf.Clamp01((_targetZoom - minZoom) / (maxZoom - minZoom));
 				// Adjust zoom speed based on height
-				float currentZoomSpeed = zoomSpeed * (1f + heightFactor * zoomHeightMultiplier);
+				var currentZoomSpeed = zoomSpeed * (1f + heightFactor * zoomHeightMultiplier);
 
 				// Update target zoom based on scroll input
 				_targetZoom -= scroll * currentZoomSpeed;
@@ -165,7 +167,7 @@ namespace RTS_1333
 			if (_isRotating)
 			{
 				// Calculate mouse movement delta (raw, frame to frame)
-				Vector3 mouseDelta = Input.mousePosition - _lastMousePosition;
+				var mouseDelta = Input.mousePosition - _lastMousePosition;
 				// Adjust target pitch (vertical, X axis) based on vertical mouse movement, scaled by sensitivity
 				_targetRotation -= mouseDelta.y * rotationSensitivity;
 				// Clamp target pitch within min and max
@@ -180,9 +182,9 @@ namespace RTS_1333
 			}
 
 			// Smoothly interpolate current rotation towards target pitch and yaw
-			Vector3 currentRotation = transform.eulerAngles;
-			float newPitch = Mathf.LerpAngle(currentRotation.x, _targetRotation, Time.deltaTime * rotationSmoothness);
-			float newYaw = Mathf.LerpAngle(currentRotation.y, _targetYaw, Time.deltaTime * rotationSmoothness);
+			var currentRotation = transform.eulerAngles;
+			var newPitch = Mathf.LerpAngle(currentRotation.x, _targetRotation, Time.deltaTime * rotationSmoothness);
+			var newYaw = Mathf.LerpAngle(currentRotation.y, _targetYaw, Time.deltaTime * rotationSmoothness);
 			// Apply new rotation (pitch and yaw, keep roll unchanged)
 			transform.eulerAngles = new Vector3(newPitch, newYaw, currentRotation.z);
 		}
@@ -207,15 +209,17 @@ namespace RTS_1333
 			if (_isPanning)
 			{
 				// Calculate mouse movement delta (raw, frame to frame)
-				Vector3 mouseDelta = Input.mousePosition - _lastPanMousePosition;
+				var mouseDelta = Input.mousePosition - _lastPanMousePosition;
 				// Convert mouse delta to world movement (pan parallel to ground)
-				Vector3 right = transform.right;
-				Vector3 forward = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
+				var right = transform.right;
+				var forward = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
 				// Move target position by mouse delta, scaled by panDragSpeed
 				_targetPosition -= (right * mouseDelta.x + forward * mouseDelta.y) * panDragSpeed * Time.deltaTime;
 				// Clamp X and Z position within min and max limits
-				_targetPosition.x = Mathf.Clamp(_targetPosition.x, 0, gridManager.GridSettings.GridSizeX * gridManager.GridSettings.NodeSize);
-				_targetPosition.z = Mathf.Clamp(_targetPosition.z, 0, gridManager.GridSettings.GridSizeY * gridManager.GridSettings.NodeSize);
+				_targetPosition.x = Mathf.Clamp(
+					_targetPosition.x, 0, gridManager.GridSettings.GridSizeX * gridManager.GridSettings.NodeSize);
+				_targetPosition.z = Mathf.Clamp(
+					_targetPosition.z, 0, gridManager.GridSettings.GridSizeY * gridManager.GridSettings.NodeSize);
 				// Update last pan mouse position
 				_lastPanMousePosition = Input.mousePosition;
 			}
@@ -225,7 +229,7 @@ namespace RTS_1333
 		private void UpdatePosition()
 		{
 			// Set new position with current X/Z and target Y (zoom)
-			Vector3 newPosition = _targetPosition;
+			var newPosition = _targetPosition;
 			newPosition.y = _targetZoom;
 
 			// Smoothly interpolate position towards target

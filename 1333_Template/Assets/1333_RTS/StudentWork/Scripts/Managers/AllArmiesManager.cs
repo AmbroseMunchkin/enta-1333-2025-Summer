@@ -16,7 +16,7 @@ namespace RTS_1333
 		void Initialize(GridManager gridManager, Pathfinder pathfinder, int armyID, string factionName);
 		void InitializeFromData(List<UnitData> data);
 
-		void SpawnUnit(UnitData data);
+		UnitInstance SpawnUnit(UnitData data);
 		void RemoveDeadUnits();
 		void AddBuilding(BuildingBase building);
 		void RemoveBuilding(BuildingBase building);
@@ -80,7 +80,7 @@ namespace RTS_1333
 
 		public IReadOnlyList<UnitInstance> Units => _units;
 		public IReadOnlyList<BuildingBase> Buildings => _buildings;
-		
+
 
 		public void Initialize(GridManager gridManager, Pathfinder pathfinder, int armyID, string factionName)
 		{
@@ -88,7 +88,7 @@ namespace RTS_1333
 			Pathfinder = pathfinder;
 			ArmyID = armyID;
 			_factionName = factionName;
-			
+
 			AllArmiesManager.Instance.RegisterArmy(armyID, this);
 		}
 
@@ -98,65 +98,25 @@ namespace RTS_1333
 			foreach (var unitData in unitDataList) SpawnUnit(unitData);
 		}
 
-		public void SpawnUnit(UnitData data)
+		public UnitInstance SpawnUnit(UnitData data)
 		{
 			if (data.UnitType == null || data.UnitType.Prefab == null)
 			{
 				Debug.LogError("Invalid UnitType or missing prefab");
-				return;
+				return null;
 			}
 
 			var instance = Object.Instantiate(data.UnitType.Prefab, data.Position, Quaternion.identity);
 			instance.Initialize(Pathfinder, data);
 			_units.Add(instance);
+			return instance;
 		}
-
-		
 
 		public void RemoveDeadUnits()
 		{
 			_units.RemoveAll(unit => unit == null || unit.IsDead);
 		}
 
-
-		
-		
-
-		private void ClearUnits()
-		{
-			foreach (var unit in _units)
-				if (unit != null)
-					Object.Destroy(unit.gameObject);
-			_units.Clear();
-		}
-		
-		public void SpawnBuilding(BuildingType type, Vector3 worldPosition)
-		{
-			if (type == null || type.Prefab == null)
-			{
-				Debug.LogError("Invalid BuildingType or missing prefab");
-				return;
-			}
-
-			Vector2Int origin = GridManager.GetNodeFromWorldPosition(worldPosition).Coordinates;
-
-			if (!GridManager.CanPlaceBuilding(type, origin))
-			{
-				Debug.Log("Invalid building placement");
-				return;
-			}
-
-			// Snap to grid
-			Vector3 worldCenter = GridManager.GetNode(origin.x, origin.y).WorldPosition;
-
-			var building = Object.Instantiate(type.Prefab, worldCenter, Quaternion.identity);
-			building.Initialize(type, origin);
-			building.AssignToArmy(this);
-
-			GridManager.PlaceBuilding(building);
-			AddBuilding(building);
-		}
-		
 		public void AddBuilding(BuildingBase building)
 		{
 			if (!_buildings.Contains(building))
@@ -175,6 +135,53 @@ namespace RTS_1333
 				GridManager.RemoveBuilding(building);
 				Object.Destroy(building.gameObject);
 			}
+		}
+
+		public UnitInstance SpawnNewUnit(UnitType unitType, Vector3 position, int armyId)
+		{
+			var data = new UnitData
+			{
+				UnitType = unitType,
+				Position = new Vector3(position.x, 0, position.z),
+				Health = unitType.MaxHp,
+				ArmyId = armyId
+			};
+			return SpawnUnit(data);
+		}
+
+		private void ClearUnits()
+		{
+			foreach (var unit in _units)
+				if (unit != null)
+					Object.Destroy(unit.gameObject);
+			_units.Clear();
+		}
+
+		public void SpawnBuilding(BuildingData data, Vector3 worldPosition)
+		{
+			if (data == null || data.Prefab == null)
+			{
+				Debug.LogError("Invalid BuildingType or missing prefab");
+				return;
+			}
+
+			var origin = GridManager.GetNodeFromWorldPosition(worldPosition).Coordinates;
+
+			if (!GridManager.CanPlaceBuilding(data, origin))
+			{
+				Debug.Log("Invalid building placement");
+				return;
+			}
+
+			// Snap to grid
+			var worldCenter = GridManager.GetNode(origin.x, origin.y).WorldPosition;
+
+			var building = Object.Instantiate(data.Prefab, worldCenter, Quaternion.identity);
+			building.Initialize(origin);
+			building.AssignToArmy(this);
+
+			GridManager.PlaceBuilding(building);
+			AddBuilding(building);
 		}
 
 		public void Dispose()

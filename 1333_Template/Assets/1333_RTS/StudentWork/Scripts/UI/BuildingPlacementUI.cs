@@ -1,21 +1,21 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using RTS_1333;
 using UnityEngine;
 
-public class BuildingPlacementUI : MonoBehaviour
+namespace RTS_1333
 {
-    [SerializeField] private RectTransform LayoutGroupParent;
-    [SerializeField] private SelectBuildingButton ButtonPrefab;
-    [SerializeField] private BuildingTypesSo BuildingData;
+	public class BuildingPlacementUI : MonoBehaviour
+	{
+		[SerializeField] private BuildingPlacementManager BuildingPlacementManager;
+		[SerializeField] private SelectBuildingButton SelectBuildingButton;
+		[SerializeField] private Transform ScrollRectContent;
 
-    private void Start()
-    {
-        foreach (BuildingData t in BuildingData.Buildings)
-        {
-            SelectBuildingButton button = Instantiate(ButtonPrefab, LayoutGroupParent);
-            button.Setup(t);
-        }
-    }
+		private void Start()
+		{
+			foreach (var building in BuildingPlacementManager.AllBuildings.Buildings)
+			{
+				var button = Instantiate(
+					SelectBuildingButton, ScrollRectContent);
+				button.Setup(building, BuildingPlacementManager);
+			}
+		}
+	}
 }

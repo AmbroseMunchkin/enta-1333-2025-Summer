@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
-using System.Collections.Generic;
 
 namespace RTS_1333
 {
@@ -14,23 +13,17 @@ namespace RTS_1333
 
 		private void Update()
 		{
-			if (Input.GetMouseButtonDown(0))
-			{
-				TrySelectUnit();
-			}
+			if (Input.GetMouseButtonDown(0)) TrySelectUnit();
 
-			if (Input.GetMouseButtonDown(1))
-			{
-				TryCommandMove();
-			}
+			if (Input.GetMouseButtonDown(1)) TryCommandMove();
 		}
 
 		private void TrySelectUnit()
 		{
-			Ray ray = _camera.ScreenPointToRay(Mouse.current.position.ReadValue());
-			if (Physics.Raycast(ray, out RaycastHit hit, 100f, _unitLayer))
+			var ray = _camera.ScreenPointToRay(Mouse.current.position.ReadValue());
+			if (Physics.Raycast(ray, out var hit, 100f, _unitLayer))
 			{
-				UnitInstance unit = hit.collider.GetComponentInParent<UnitInstance>();
+				var unit = hit.collider.GetComponentInParent<UnitInstance>();
 				if (unit != null && unit.Hp > 0)
 				{
 					_selectedUnit = unit;
@@ -44,20 +37,19 @@ namespace RTS_1333
 			if (_selectedUnit == null)
 				return;
 
-			Ray ray = _camera.ScreenPointToRay(Mouse.current.position.ReadValue());
+			var ray = _camera.ScreenPointToRay(Mouse.current.position.ReadValue());
 
 			// Define a plane at y = 0, facing up
-			Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+			var groundPlane = new Plane(Vector3.up, Vector3.zero);
 
-			if (groundPlane.Raycast(ray, out float enter))
+			if (groundPlane.Raycast(ray, out var enter))
 			{
-				Vector3 hitPoint = ray.GetPoint(enter);
+				var hitPoint = ray.GetPoint(enter);
 
-				GridNode targetNode = _gridManager.GetNodeFromWorldPosition(hitPoint);
+				var targetNode = _gridManager.GetNodeFromWorldPosition(hitPoint);
 				_selectedUnit.MoveTo(targetNode);
 				Debug.Log($"Commanded move to: {targetNode.WorldPosition}");
 			}
 		}
-
 	}
 }

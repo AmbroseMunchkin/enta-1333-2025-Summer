@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e560d2e9db764420a4639cecbcaf1353, type: 3}
+  m_Name: Passive_Wall
+  m_EditorClassIdentifier: 
+  _width: 2
+  _height: 2
+  _maxHp: 100
+  _armor: 10
+  _moveCost: -1
+  _function: 4
+  _ghostPrefab: {fileID: 100000, guid: a7621f649dd91ca468d28e2fb129e90b, type: 3}
+  _buildingPrefab: {fileID: 7502940364684364134, guid: 5c497c378a2863f4eae2d3488f12cae3, type: 3}
+  _buildingSprite: {fileID: 21300000, guid: 853ee370545ed5945b0cabf875e67b59, type: 3}
+  _buildingName: Wall
