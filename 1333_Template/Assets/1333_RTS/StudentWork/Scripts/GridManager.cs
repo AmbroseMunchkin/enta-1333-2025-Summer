@@ -7,6 +7,7 @@ public class GridManager : MonoBehaviour
 {
     // variable to allow us to plug in our GridSettings scriptable Object
     [SerializeField] private GridSettings _gridSettings;
+
     public GridSettings GridSettings => _gridSettings;
 
     // 2-Dimensional array of GridNode structs

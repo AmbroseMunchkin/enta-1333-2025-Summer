@@ -1,11 +1,15 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 //Represents each node on our grid. Lightweight struct
 [System.Serializable]
 public struct GridNode
 {
+    public TerrainType TerrainType;
     public string Name; //an index for us to keep track and organize nodes
     public Vector3 WorldPosition;
     public bool Walkable;
     public int Weight;
+    public Color GizmoColor;
 }
+
