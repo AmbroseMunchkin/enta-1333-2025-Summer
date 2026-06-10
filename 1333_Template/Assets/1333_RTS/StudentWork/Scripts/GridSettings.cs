@@ -12,12 +12,10 @@ public class GridSettings : ScriptableObject
     [SerializeField] private float _nodeSize = 1f;
     [SerializeField] private bool _useXZPlane = true;
     [SerializeField] private bool _allowDiagonal = true;
-    [SerializeField] private List<TerrainType> _terrainTypes;
 
     public int GridSizeX => _gridSizeX;
     public int GridSizeY => _gridSizeY;
     public float NodeSize => _nodeSize;
     public bool UseXZPlane => _useXZPlane;
     public bool AllowDiagonal => _allowDiagonal;
-    public List<TerrainType> TerrainTypes => _terrainTypes;
 }

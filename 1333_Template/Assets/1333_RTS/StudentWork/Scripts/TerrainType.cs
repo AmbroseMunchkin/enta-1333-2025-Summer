@@ -5,7 +5,7 @@ using UnityEngine;
 public class TerrainType : ScriptableObject
 {
     [SerializeField] private string _terrainName;
-    [SerializeField] private Color _color = Color.gray;
+    [SerializeField] private Color _color;
     [SerializeField] private bool _walkable = true;
     [SerializeField] private int _movementCost = 1;
     [SerializeField] private Texture2D _terrainTexture;
