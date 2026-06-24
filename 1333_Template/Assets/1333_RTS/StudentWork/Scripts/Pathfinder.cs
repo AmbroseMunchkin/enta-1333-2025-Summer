@@ -47,5 +47,22 @@ public class Pathfinder : MonoBehaviour
     //Visualized instances
     private NaivePathfinderVisualizer _naivePathfinderVisualizer;
 
-    private System.Random _seedRandom;
+    private System.Random _seededRandom;
+
+    //Visualization State
+    private HashSet<Vector2Int> _visitedNodes = new HashSet<Vector2Int>();
+    private Dictionary<Vector2Int, int> _nodeDistance = new Dictionary<Vector2Int, int>(); //track distances from start
+    private List<Vector2Int> _currentPath = new List<Vector2Int>();
+    private List<Vector2Int> _reconstructionPath = new List<Vector2Int>();
+    private Vector2Int? _startNode;
+    private Vector2Int? _endNode;
+    private VisualizationState _visualization = VisualizationState.Idle;
+    private Coroutine _currentVisualization;
+    private List<Vector3> _finalPath;
+    private bool _shouldPause;
+    private bool _isStepMode;
+    private List<Vector2Int> _explorationOrder;
+    private Vector2Int? _currentNode;
+    private List<Vector2Int> _currentNeighbours;
+
 }

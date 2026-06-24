@@ -1,6 +1,5 @@
 using UnityEngine;
 
-//GridSettings is a ScriptableObject for easy customization of grid dimensions and orientation
 [CreateAssetMenu(fileName = "TerrainType", menuName = "Game/TerrainType")]
 public class TerrainType : ScriptableObject
 {

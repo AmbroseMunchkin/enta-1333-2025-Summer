@@ -7,7 +7,7 @@ public struct GridNode
 {
     public TerrainType TerrainType;
     public string Name; //an index for us to keep track and organize nodes
-    // public string Name => TerrainType?.TerrainName ?? "No name";
+    
     public Vector3 WorldPosition;
     public bool Walkable => TerrainType != null ? TerrainType.Walkable : false;
     public int Weight => TerrainType != null && TerrainType.Walkable ? TerrainType.MovementCost : 1;
