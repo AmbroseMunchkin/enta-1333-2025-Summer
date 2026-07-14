@@ -48,9 +48,9 @@ public class MainMenu : MonoBehaviour
         //slide the panel out, reset the button to its default position
         _recTransform.DOAnchorPosY(_closePosition, _transitionDuration).SetEase(Ease.InQuad).OnComplete(() =>
         {
-            _playButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(1070, -65);
-            _settingsButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(-1070, 0);
-            _quitButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(1070, 65);
+            _playButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(2000, -65);
+            _settingsButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(-2000, 0);
+            _quitButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(2000, 65);
         });
         GetComponent<CanvasGroup>().blocksRaycasts = true;
         _cameraController.isPaused = false;

@@ -65,4 +65,37 @@ public class Pathfinder : MonoBehaviour
     private Vector2Int? _currentNode;
     private List<Vector2Int> _currentNeighbours;
 
+    private void Awake()
+    {
+        if (_gridManager == null)
+        {
+            Debug.LogError("Pathfinder: GridManager reference is missing.Please assign it in the inspector");
+            enabled = false;
+            return;
+        }
+
+        //initialize pathfinders
+        //_naivePathfinder = new NaivePathfinder(getNeighbours)
+    }
+    private bool IsValidCoordinate(Vector2Int coord)
+    {
+        return coord.x >= 0 && coord.x < _gridManager.GridSettings.GridSizeX && coord.y >= 0 && coord.y < _gridManager.GridSettings.GridSizeY;
+    }
+    private List<Vector2Int> GetNeighbours (Vector2Int coord)
+    {
+        List<Vector2Int> neighbours = new List<Vector2Int>();
+        int[] dx = { -1, 0, 1, 0, -1, -1, 1, 1 };
+        int[] dy = { 0, 1, 0, -1, -1, 1, -1, 1 };
+
+        //check cardinal directions first
+        for (int i = 0; i < 4; i++)
+        {
+            Vector2Int neighbour = new Vector2Int(coord.x + dx[i], coord.y + dy[i]);
+            if(IsValidCoordinate(neighbour) && _gridManager.IsWalkable(neighbour))
+            {
+                neighbours.Add(neighbour);
+            }
+        }
+        return neighbours;
+    }
 }

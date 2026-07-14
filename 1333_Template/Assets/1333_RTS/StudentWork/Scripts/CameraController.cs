@@ -18,8 +18,12 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
-        MoveCamera();
-        ZoomCamera();
+        if (!isPaused)
+        {
+            MoveCamera();
+            ZoomCamera();
+        }
+        
     }
     private void MoveCamera()
     {

@@ -24,7 +24,7 @@ public class SettingsUI : MonoBehaviour
         //slide the panel out, reset the button to its default position
         _recTransform.DOAnchorPosY(_closePosition, _transitionDuration).SetEase(Ease.InQuad).OnComplete(() =>
         {
-            _returnButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -240);
+            _returnButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -640);
         });
         GetComponent<CanvasGroup>().blocksRaycasts = true;
     }

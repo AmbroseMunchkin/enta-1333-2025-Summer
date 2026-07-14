@@ -9,6 +9,7 @@ public class GridManager : MonoBehaviour
     [SerializeField] private GridSettings _gridSettings;
 
     public GridSettings GridSettings => _gridSettings;
+    [SerializeField] private TerrainType _defaultterrainType;
 
     // 2-Dimensional array of GridNode structs
     private GridNode[,] gridNodes;
@@ -16,6 +17,8 @@ public class GridManager : MonoBehaviour
 #if UNITY_EDITOR
     [Header("Debug for editor playmode only")]
     [SerializeField] private List<GridNode> AllNodes = new();
+    [SerializeField] private bool _showGrid = true;
+    [SerializeField] private bool _showNodeInfo = false;
 #endif
 
     //flag for other scripts or this one to use to makesure grid is initialized before doing something else
@@ -40,6 +43,7 @@ public class GridManager : MonoBehaviour
                 {
                     Name = $"Cell_{(x + _gridSettings.GridSizeX * x + y)}",
                     WorldPosition = worldPos,
+                    TerrainType = _defaultterrainType,
                     //Walkable = true,
                     //Weight = 1
                 };
@@ -49,53 +53,42 @@ public class GridManager : MonoBehaviour
         }
         IsInitialized = true;
     }
+    public void SetTerrainType(int x, int y, TerrainType terrain)
+    {
+        if (!IsValidCoordinate(x, y)) return;
+        //pull a node out from our array
+        //set its terrain type
+        //put it back in the array
+        GridNode node = gridNodes[x, y];
+        node.TerrainType = terrain;
+        gridNodes[x, y] = node;
+    }
+    private bool IsValidCoordinate(int x , int y)
+    {
+        return x>= 0 && x < GridSettings.GridSizeX && y >= 0 && y < GridSettings.GridSizeY;
+    }
+    public bool IsWalkable(Vector2Int coord)
+    {
+        if (IsValidCoordinate(coord.x, coord.y)) return false;
+        return gridNodes[coord.x, coord.y].Walkable;
+    }
+    public float GetNodeWeight(Vector2Int coord)
+    {
+        if (IsValidCoordinate(coord.x, coord.y)) return float.MaxValue;
+        return gridNodes[coord.x, coord.y].Weight;
+    }
 #if UNITY_EDITOR
     private void PopulatedDebugList()
     {
+        //clear our debug list of gridnodes
+        //then for each already existing GridNode, add it to our debug allnodes list
+        //for debug purposes
         AllNodes.Clear();
         for(int x = 0; x < _gridSettings.GridSizeX; x++)
         {
             for(int y = 0; y < _gridSettings.GridSizeY; y++)
             {
-                GridNode node = gridNodes[x, y];
-                AllNodes.Add(new GridNode
-                {
-                    Name = $"Cell_{x}+{y}",
-                    WorldPosition = node.WorldPosition,
-                    //Walkable = node.Walkable,
-                    //Weight = node.Weight
-                });
-            }
-        }
-    }
-#endif
-
-    //Function to retrieve GridNode data efficiently
-    public GridNode GetNode(int x, int y)
-    {
-        if(x < 0 || x >= _gridSettings.GridSizeX || y < 0 || y>= _gridSettings.GridSizeY)
-            throw new System.IndexOutOfRangeException("Grid node indices out of range");
-
-        return gridNodes[x, y];
-    }
-
-    public void SetWalkable(int x, int y, bool walkable)
-    {
-        //gridNodes[x,y].Walkable = walkable;
-    }
-    private void OnDrawGizmos()
-    {
-        if (gridNodes == null || GridSettings == null) return;
-
-        Gizmos.color = Color.green;
-        //Draw the gridnode gizmos, size is 90% of GridNode Size for visual clarity
-        for (int x = 0; x < _gridSettings.GridSizeX; x++)
-        {
-            for (int y = 0; y < _gridSettings.GridSizeY; y++)
-            {
-                GridNode node = gridNodes[x, y];
-                Gizmos.color = node.Walkable ? Color.green : Color.red;
-                Gizmos.DrawWireCube(node.WorldPosition, Vector3.one * GridSettings.NodeSize * 0.9f);
+                AllNodes.Add(gridNodes[x, y]);
             }
         }
     }
@@ -120,5 +113,30 @@ public class GridManager : MonoBehaviour
             }
         }
         
+    }
+#endif
+
+    //Function to retrieve GridNode data efficiently
+    public GridNode GetNode(int x, int y)
+    {
+        if (!IsValidCoordinate(x, y))
+            throw new System.IndexOutOfRangeException("Grid node indices out of range");
+
+        return gridNodes[x, y];
+    }
+    private void OnDrawGizmos()
+    {
+        if (!_showGrid || gridNodes == null || _gridSettings == null) return;
+
+        //Draw the gridnode gizmos, size is 90% of GridNode Size for visual clarity
+        for (int x = 0; x < _gridSettings.GridSizeX; x++)
+        {
+            for (int y = 0; y < _gridSettings.GridSizeY; y++)
+            {
+                GridNode node = gridNodes[x, y];
+                Gizmos.color = node.GizmoColor;
+                Gizmos.DrawWireCube(node.WorldPosition, Vector3.one * GridSettings.NodeSize * 0.9f);
+            }
+        }
     }
 }
